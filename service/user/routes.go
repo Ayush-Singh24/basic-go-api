@@ -31,6 +31,7 @@ func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
 	user, isLoggedIn := auth.AlreadyLoggedIn(h.store, r)
 	if isLoggedIn {
 		utils.WriteJSON(w, http.StatusOK, types.User{Email: user.Email, FirstName: user.FirstName, LastName: user.LastName})
+		return
 	}
 
 	//get JSON payload
