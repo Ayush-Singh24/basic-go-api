@@ -9,6 +9,11 @@ type RegisterUserPayload struct {
 	Password  string `json:"password" validate:"required,min=3,max=30"`
 }
 
+type LoginUserPayload struct {
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required"`
+}
+
 type User struct {
 	Id        int       `json:"id"`
 	FirstName string    `json:"firstName"`
