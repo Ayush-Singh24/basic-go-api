@@ -53,4 +53,5 @@ type ProductPayload struct {
 type ProductStore interface {
 	GetProducts() ([]Product, error)
 	CreateProduct(Product) error
+	GetProductById(id int) (*Product, error)
 }

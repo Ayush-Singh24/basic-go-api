@@ -2,6 +2,7 @@ package product
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/Ayush-Singh24/basic-go-api/types"
 )
@@ -60,4 +61,28 @@ func (s *Store) CreateProduct(p types.Product) error {
 		return err
 	}
 	return nil
+}
+
+func (s *Store) GetProductById(id int) (*types.Product, error) {
+	rows, err := s.db.Query("SELECT * FROM products WHERE id=?", id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	product := new(types.Product)
+
+	for rows.Next() {
+		product, err = scanRowIntoProduct(rows)
+		if err != nil {
+			return nil, err
+		}
+
+	}
+
+	if product.Id == 0 {
+		return nil, fmt.Errorf("product not found")
+	}
+
+	return product, nil
 }

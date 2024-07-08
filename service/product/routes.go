@@ -3,6 +3,7 @@ package product
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/Ayush-Singh24/basic-go-api/types"
 	"github.com/Ayush-Singh24/basic-go-api/utils"
@@ -21,6 +22,7 @@ func NewHandler(store types.ProductStore) *Handler {
 func (h *Handler) RegisterRoutes(router *mux.Router) {
 	router.HandleFunc("/products", h.handleGetProducts).Methods(http.MethodGet)
 	router.HandleFunc("/products", h.handleCreateProduct).Methods(http.MethodPost)
+	router.HandleFunc("/products/{id}", h.handleGetProductById).Methods(http.MethodGet)
 }
 
 func (h *Handler) handleGetProducts(w http.ResponseWriter, r *http.Request) {
@@ -73,4 +75,28 @@ func (h *Handler) handleCreateProduct(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.WriteJSON(w, http.StatusCreated, nil)
+}
+
+func (h *Handler) handleGetProductById(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	productId := vars["id"]
+	if productId == "" {
+		utils.WriteError(w, http.StatusBadRequest, nil)
+		return
+	}
+
+	intProductId, err := strconv.Atoi(productId)
+
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	product, err := h.store.GetProductById(intProductId)
+
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+	}
+
+	utils.WriteJSON(w, http.StatusOK, product)
 }
