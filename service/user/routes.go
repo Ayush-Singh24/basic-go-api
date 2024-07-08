@@ -27,6 +27,12 @@ func (h *Handler) RegisterRoutes(router *mux.Router) {
 }
 
 func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
+	//check for already logged in user
+	user, isLoggedIn := auth.AlreadyLoggedIn(h.store, r)
+	if isLoggedIn {
+		utils.WriteJSON(w, http.StatusOK, types.User{Email: user.Email, FirstName: user.FirstName, LastName: user.LastName})
+	}
+
 	//get JSON payload
 	var payload types.LoginUserPayload
 	if err := utils.ParseJSON(r, &payload); err != nil {
@@ -61,7 +67,19 @@ func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
 		utils.WriteError(w, http.StatusInternalServerError, err)
 	}
 
-	utils.WriteJSON(w, http.StatusOK, map[string]string{"token": token})
+	cookie := http.Cookie{
+		Name:     "token",
+		Value:    token,
+		Path:     "/",
+		MaxAge:   3600,
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
+	}
+
+	http.SetCookie(w, &cookie)
+
+	utils.WriteJSON(w, http.StatusOK, nil)
 }
 
 func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
