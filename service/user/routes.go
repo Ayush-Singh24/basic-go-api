@@ -2,6 +2,7 @@ package user
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/Ayush-Singh24/basic-go-api/config"
@@ -46,6 +47,7 @@ func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
 		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("not found, invalid email or password"))
 		return
 	}
+	log.Println(u.Email)
 
 	//check if the entered password is correct
 	if !auth.ComparePasswords(u.Password, []byte(payload.Password)) {
@@ -89,7 +91,7 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//if it doesn't, create new user
+	//if user doesn't exist, create new user
 	err = h.store.CreateUser(types.User{
 		FirstName: payload.FirstName,
 		LastName:  payload.LastName,

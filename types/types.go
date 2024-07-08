@@ -1,6 +1,9 @@
 package types
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 type RegisterUserPayload struct {
 	FirstName string `json:"firstName" validate:"required"`
@@ -39,6 +42,15 @@ type Product struct {
 	CreatedAt   time.Time `json:"createdAt"`
 }
 
+type ProductPayload struct {
+	Name        string      `json:"name" validate:"required" `
+	Description string      `json:"description" validate:"required"`
+	Image       string      `json:"image" validate:"required"`
+	Price       json.Number `json:"price" validate:"required,gt=0"`
+	Quantity    json.Number `json:"quantity" validate:"required,gt=0"`
+}
+
 type ProductStore interface {
 	GetProducts() ([]Product, error)
+	CreateProduct(Product) error
 }
